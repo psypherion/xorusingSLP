@@ -1,7 +1,4 @@
-# train.py
-
 import numpy as np
-
 
 class Trainer:
 
@@ -12,9 +9,9 @@ class Trainer:
         self.epochs = epochs
         self.lr = lr
 
-    def train(self):
-
-        y_pm = 2 * self.y - 1  # convert to {-1,1}
+    def train_with_history(self):
+        y_pm = 2 * self.y - 1
+        loss_history = []
 
         for _ in range(self.epochs):
 
@@ -23,6 +20,9 @@ class Trainer:
             f = np.real(u ** 2)
 
             margins = y_pm * f
+            loss = np.mean(np.maximum(0, 1 - margins))
+            loss_history.append(loss)
+
             grad = 0.0
 
             for i in range(len(self.z)):
@@ -32,10 +32,10 @@ class Trainer:
                     grad += -y_pm[i] * df_dtheta
 
             grad /= len(self.z)
-
             self.model.update(grad, self.lr)
 
-        return self.model
+        return self.model, loss_history
+
 
 
 if __name__ == "__main__":
